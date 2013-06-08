@@ -13,14 +13,18 @@ exit;
 # 
 sub main
 {
-	my $yours = param('sentence');
-	if(param){
-		if($yours ne ""){
-			ChatBot::Control::hear($yours);
+	my $cntl = ChatBot::Control->new();
+
+	my $name = param('name');
+	my $msg = param('sentence');
+
+	if( param ){
+		if( $name ne "" && $msg ne "" ){
+			$cntl->hear($name, $msg);
 		}
 	}
 
-	my $bots = ChatBot::Control::say();
+	my @chat = $cntl->say();
 
 	print
 		header( -charset => "utf-8" ),
@@ -28,25 +32,41 @@ sub main
 					-title => 'chat bot',
 					-encoding => 'utf-8' );
 
-	if($yours ne ""){
-		# your saying
+	# if($yours ne ""){
+	# 	# your saying
+	# 	print
+	# 		h3( "you:" ),
+	# 		"$yours\n",
+	# 		hr,"\n";
+	# }
+
+	# # output from bot
+	# print
+	# 	h3( "bot:" ),
+	# 	"$bots\n",
+	# 	hr,"\n";
+
+	for my $dat (@chat){
 		print
-			h3( "you:" ),
-			"$yours\n",
-			hr,"\n";
+			h3( $dat->{'name'}.":" ),
+			$dat->{'sentence'},hr,"\n";
 	}
 
-	# output from bot
-	print
-		h3( "bot:" ),
-		"$bots\n",
-		hr,"\n";
-
-	# input to bot
+	# form for input to bot
 	print
 		start_form,
-		textfield('sentence'),
+		"name:",textfield( -name => 'name',
+						   -value => $name ),
+		br,
+		"msg:",textfield( -name => 'sentence',
+						  -value => ""),
 		submit,
+		end_form,
+		"\n";
+
+	print
+		start_form,
+		submit('reload'),
 		end_form,
 		"\n";
 		
